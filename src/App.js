@@ -1,26 +1,96 @@
 import React from 'react';
-import logo from './logo.svg';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect,
+  withRouter
+} from "react-router-dom";
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import TodoInput from './components/TodoInput';
+import TodoList from './components/TodoList';
+
+class App extends React.Component {
+
+  constructor() {
+    super();
+    this.state = {
+      items: [],
+      id: '',
+      text: '',
+      done: false
+    }
+  }
+
+  handleChange = (event) => {
+    this.setState({
+      text: event.target.value,
+    });
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+
+    const newTask = {
+      id: Date.now(),
+      text: this.state.text,
+      done: false
+    }
+
+    const UpdateTask = [...this.state.items, newTask];
+    this.setState({
+      items: UpdateTask,
+      id: '',
+      text: '',
+      done: false
+    });
+  }
+
+  handleDelete = (id) => {
+    const filteredItems = this.state.items.filter(item => item.id !== id);
+
+    this.setState({
+      items: filteredItems
+    });
+  }
+
+  handleDone = (id) => {
+    const filteredItems = this.state.items.filter(item => item.id !== id);
+    const taskDone = this.state.items.find(item => item.id === id);
+
+    const updatedTask = {
+      id: id,
+      text: taskDone.text,
+      done: !taskDone.done
+    }
+
+    const updatedList = [...filteredItems, updatedTask];
+
+    this.setState({
+      items: updatedList
+    });
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <div className="container">
+          <TodoInput
+            task={this.state.text}
+            handleChange={this.handleChange}
+            handleSubmit={this.handleSubmit}
+          />
+          <TodoList
+            tasks={this.state.items}
+            handleDone={this.handleDone}
+            handleDelete={this.handleDelete}
+          />
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
